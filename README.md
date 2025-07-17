@@ -1,4 +1,5 @@
 🎵 Musicalendaria
+
 Proyecto final (TP) de una cartelera musical interactiva.
 Este proyecto permite visualizar eventos musicales, artistas y fechas de presentaciones de forma intuitiva.
 
@@ -13,10 +14,9 @@ Musicalendaria es una aplicación web que funciona como una cartelera musical, i
 🖱️ Interfaz amigable e intuitiva.
 ⚙️ Tecnologías Utilizadas
 HTML5 / CSS3
-JavaScript (Vanilla o con framework según corresponda)
-React / Vue.js / Angular (dependiendo de tu implementación)
-Firebase / JSON / API externa (si usaste alguna para datos)
-LocalStorage / Backend ligero (si corresponde)
+JavaScript 
+JSON 
+Backend ligero
 📦 Instalación
 Clona el repositorio:
 bash
@@ -45,16 +45,6 @@ npm start
 📚 Estructura del Proyecto
 
 
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
 musicalendaria/
 │
 ├── index.html
