@@ -1,4 +1,4 @@
-// backend/server.js
+// server.js
 
 // Importa Express para crear el servidor
 const express = require('express');
@@ -10,10 +10,9 @@ require('dotenv').config();
 const session = require('express-session');
 
 // Importa rutas de autenticación (login, registro, logout)
-const authRoutes = require('./routes/authRoutes');
+const authRoutes = require('./backend/routes/authRoutes');
 
 //const authMiddleware = require('./middleware/authMiddleware');
-
 
 // Crea la app de Express
 const app = express();
@@ -35,9 +34,9 @@ app.use(session({
 }));
 
 // Sirve archivos estáticos desde el frontend (html, css, js)
-app.use(express.static('../frontend'));
+app.use(express.static('./frontend'));
 
-const authMiddleware = require('./middleware/authMiddleware');
+const authMiddleware = require('./backend/middleware/authMiddleware');
 
 app.get('/dashboard', authMiddleware, (req, res) => {
 const path = require('path');

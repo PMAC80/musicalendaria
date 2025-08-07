@@ -1,8 +1,8 @@
 // backend/utils/db.js
 
 // Importa MySQL2 para conexión a base de datos
-const mysql = require('mysql2');
 require('dotenv').config();
+const mysql = require('mysql2');
 
 // Crea una conexión con la base de datos MySQL
 const connection = mysql.createConnection({
