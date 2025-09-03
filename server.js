@@ -5,8 +5,10 @@ const express = require('express');
 require('dotenv').config();
 const session = require('express-session');
 const path = require('path'); // Módulo nativo para rutas de archivos
+
 const authRoutes = require('./backend/routes/authRoutes');
 const authMiddleware = require('./backend/middleware/authMiddleware');
+const eventRoutes = require('./backend/routes/eventRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,8 +20,10 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 }));
+
 app.use(express.static('./frontend'));
 app.use('/auth', authRoutes);
+app.use('/api/eventos', eventRoutes); // Ruta pública para la cartelera
 
 // Ruta protegida: muestra el dashboard del artista por defecto si acceden a /dashboard o /dashboard/
 app.get(['/dashboard', '/dashboard/'], authMiddleware, (req, res) => {

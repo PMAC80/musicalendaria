@@ -9,6 +9,56 @@
 <body>
   <h1>Bienvenido, Artista</h1>
   <p>Desde aquí podrás cargar tu información y eventos.</p>
+  <form id="eventoForm" method="POST" action="/api/eventos">
+    <h2>Cargar nuevo evento</h2>
+    <label for="titulo">Título:</label><br>
+    <input type="text" id="titulo" name="titulo" required><br>
+    <label for="fecha">Fecha:</label><br>
+    <input type="date" id="fecha" name="fecha" required><br>
+    <label for="hora">Hora:</label><br>
+    <input type="time" id="hora" name="hora" required><br>
+    <label for="lugar">Lugar:</label><br>
+    <input type="text" id="lugar" name="lugar" required><br>
+    <label for="tipo_entrada">Tipo de entrada:</label><br>
+    <input type="text" id="tipo_entrada" name="tipo_entrada" required><br>
+    <label for="precio">Precio:</label><br>
+    <input type="number" id="precio" name="precio" min="0" step="0.01" required><br>
+    <label for="enlace_entradas">Enlace para entradas:</label><br>
+    <input type="url" id="enlace_entradas" name="enlace_entradas"><br>
+    <label for="enlace_flyer">Enlace a imagen/flyer:</label><br>
+    <input type="url" id="enlace_flyer" name="enlace_flyer"><br>
+    <button type="submit">Enviar evento</button>
+  </form>
+  <div id="eventoMsg"></div>
   <a href="/auth/logout">Cerrar sesión</a>
+  <script>
+    document.getElementById('eventoForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        titulo: form.titulo.value,
+        fecha: form.fecha.value,
+        hora: form.hora.value,
+        lugar: form.lugar.value,
+        tipo_entrada: form.tipo_entrada.value,
+        precio: form.precio.value,
+        enlace_entradas: form.enlace_entradas.value,
+        enlace_flyer: form.enlace_flyer.value,
+        habilitado: false
+      };
+      const res = await fetch('/api/eventos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const msg = document.getElementById('eventoMsg');
+      if (res.ok) {
+        msg.textContent = 'Evento enviado para revisión del administrador.';
+        form.reset();
+      } else {
+        msg.textContent = 'Error al enviar el evento.';
+      }
+    });
+  </script>
 </body>
 </html>
