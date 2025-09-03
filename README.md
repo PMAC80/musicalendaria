@@ -6,13 +6,13 @@ Este proyecto permite visualizar eventos musicales, artistas y fechas de present
 📌 Descripción
 Musicalendaria es una aplicación web que funciona como una cartelera musical, ideal para quienes quieren estar al tanto de conciertos, festivales y presentaciones en vivo cerca de su ubicación o en fechas específicas.
 
-🧩 Características Principales
+🧩 Características Principales:
 📅 Visualización de eventos por fecha.
 📍 Filtro por género musical, artista o ubicación.
 🎤 Información detallada de artistas y eventos.
 🌐 Diseño responsivo para dispositivos móviles y escritorio.
 🖱️ Interfaz amigable e intuitiva.
-⚙️ Tecnologías Utilizadas
+⚙️ Tecnologías Utilizadas:
 HTML5 / CSS3
 JavaScript 
 JSON 
