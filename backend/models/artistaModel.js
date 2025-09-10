@@ -1,21 +1,25 @@
 const db = require('../utils/db');
 
-exports.create = (usuarioId, nombreArtista) => {
-  return new Promise((resolve, reject) => {
-    const query = 'INSERT INTO artistas (usuario_id, nombre_artista) VALUES (?, ?)';
-    db.query(query, [usuarioId, nombreArtista], (err, results) => {
-      if (err) return reject(err);
-      resolve(results.insertId);
+const artistaModel = {
+  create: (userId, nombreArtista) => {
+    return new Promise((resolve, reject) => {
+      const query = 'INSERT INTO artistas (user_id, nombre_artista) VALUES (?, ?)';
+      db.query(query, [userId, nombreArtista], (err, results) => {
+        if (err) return reject(err);
+        resolve(results.insertId);
+      });
     });
-  });
+  },
+
+  findByUserId: async (userId) => {
+    const query = 'SELECT * FROM artistas WHERE user_id = ?';
+    return new Promise((resolve, reject) => {
+      db.query(query, [userId], (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0]);
+      });
+    });
+  }
 };
 
-exports.findByUserId = (usuarioId) => {
-  return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM artistas WHERE usuario_id = ?';
-    db.query(query, [usuarioId], (err, results) => {
-      if (err) return reject(err);
-      resolve(results[0]);
-    });
-  });
-};
+module.exports = artistaModel;

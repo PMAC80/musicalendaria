@@ -32,6 +32,7 @@ router.post('/', async (req, res) => {
     // Obtener el artista_id desde la sesión o el body (ajustar según tu lógica de autenticación)
     // Aquí se asume que el artista está logueado y su id está en req.session.userId
     const artistaId = req.session && req.session.userId ? req.session.userId : req.body.artista_id;
+    console.log('artistaId:', artistaId);
     if (!artistaId) {
       return res.status(401).json({ error: 'No autenticado como artista' });
     }
@@ -39,7 +40,8 @@ router.post('/', async (req, res) => {
     await Event.create(artistaId, evento);
     res.status(201).json({ message: 'Evento enviado para revisión' });
   } catch (err) {
-    res.status(500).json({ error: 'Error al crear el evento' });
+    console.error('Error al crear el evento:', err);
+    res.status(500).json({ error: err.message || 'Error al crear el evento' });
   }
 });
 

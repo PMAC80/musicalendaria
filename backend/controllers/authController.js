@@ -39,30 +39,31 @@ exports.register = async (req, res) => {
 // Login
 exports.login = async (req, res) => {
   try {
-    // Extrae email y password del cuerpo de la petición
     const { email, password } = req.body;
-    // Busca el usuario por email en la base de datos
     const user = await User.findByEmail(email);
-    // Si el usuario no existe, retorna 
-    if (!user) return res.redirect('/login.html');
+    if (!user) return res.status(401).json({ error: 'Usuario no encontrado' });
 
-    // Compara la contraseña ingresada con el hash guardado
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.redirect('/login.html');
+    if (!match) return res.status(401).json({ error: 'Contraseña incorrecta' });
 
-    // Guarda el ID del usuario en la sesión para mantenerlo logueado
     req.session.userId = user.id;
-    // Redirecciona según el rol del usuario
+
     if (user.rol === 'admin') {
-      res.redirect('/dashboard/admin.html');
+      // Para admin, redirige como antes
+      return res.json({ success: true, rol: 'admin', redirect: '/dashboard/admin.html' });
     } else if (user.rol === 'artista') {
-      res.redirect('/dashboard/artista.html');
+      // Para artista, busca el artist_id y lo devuelve
+      const artista = await Artista.findByUserId(user.id);
+      if (!artista) {
+        return res.status(403).json({ error: 'No existe artista para este usuario' });
+      }
+      return res.json({ success: true, rol: 'artista', redirect: '/dashboard/artista.html', artist_id: artista.id });
     } else {
-      res.redirect('/'); // O a una página de error
+      return res.json({ success: true, rol: user.rol, redirect: '/' });
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error al iniciar sesión');
+    res.status(500).json({ error: 'Error al iniciar sesión' });
   }
 };
 
