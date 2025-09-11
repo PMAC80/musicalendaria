@@ -1,3 +1,22 @@
+// Ruta para habilitar un evento (admin)
+router.put('/:id/habilitar', async (req, res) => {
+  try {
+    const id = req.params.id;
+    await Event.habilitar(id);
+    res.json({ message: 'Evento habilitado' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al habilitar el evento' });
+  }
+});
+// Ruta para que el admin vea todos los eventos (habilitados y no habilitados)
+router.get('/pendientes', async (req, res) => {
+  try {
+    const eventos = await Event.getAllRaw();
+    res.json(eventos);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener los eventos pendientes' });
+  }
+});
 const express = require('express');
 const router = express.Router();
 const Event = require('../models/eventModel');
@@ -29,9 +48,8 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     console.log('Nuevo evento recibido:', req.body);
-    // Obtener el artista_id desde la sesión o el body (ajustar según tu lógica de autenticación)
-    // Aquí se asume que el artista está logueado y su id está en req.session.userId
-    const artistaId = req.session && req.session.userId ? req.session.userId : req.body.artista_id;
+    // Usar siempre el artista_id que viene en el body (id de la tabla artistas)
+    const artistaId = req.body.artista_id;
     console.log('artistaId:', artistaId);
     if (!artistaId) {
       return res.status(401).json({ error: 'No autenticado como artista' });

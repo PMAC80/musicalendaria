@@ -8,7 +8,59 @@
 </head>
 <body>
   <h1>Bienvenido, Administrador</h1>
-  <p>Desde aquí podés validar artistas.</p>
+  <p>Desde aquí podés validar y habilitar eventos.</p>
+  <table id="tablaEventos" border="1" style="margin-bottom:20px;">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Título</th>
+        <th>Artista</th>
+        <th>Fecha</th>
+        <th>Lugar</th>
+        <th>Habilitado</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <div id="msgAdmin"></div>
   <a href="/auth/logout">Cerrar sesión</a>
+
+  <script>
+    async function cargarPendientes() {
+      const res = await fetch('/api/eventos/pendientes');
+      const eventos = await res.json();
+      const tbody = document.querySelector('#tablaEventos tbody');
+      tbody.innerHTML = '';
+      eventos.forEach(ev => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${ev.id}</td>
+          <td>${ev.titulo}</td>
+          <td>${ev.nombre_artista}</td>
+          <td>${ev.fecha}</td>
+          <td>${ev.lugar}</td>
+          <td>${ev.habilitado ? 'Sí' : 'No'}</td>
+          <td>
+            ${ev.habilitado ? '' : `<button onclick="habilitarEvento(${ev.id})">Habilitar</button>`}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function habilitarEvento(id) {
+      const res = await fetch(`/api/eventos/${id}/habilitar`, { method: 'PUT' });
+      const msg = document.getElementById('msgAdmin');
+      if (res.ok) {
+        msg.textContent = 'Evento habilitado correctamente.';
+        cargarPendientes();
+      } else {
+        msg.textContent = 'Error al habilitar el evento.';
+      }
+    }
+
+    cargarPendientes();
+  </script>
 </body>
 </html>
