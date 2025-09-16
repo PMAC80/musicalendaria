@@ -55,6 +55,25 @@ musicalendaria/
 ├── assets/
 │   └── (imágenes, iconos, etc.)
 └── README.md
+## 🛠️ Funcionamiento Técnico
+
+El sistema cuenta con dos roles principales:
+
+- **Artista:** Puede registrarse, iniciar sesión y crear eventos musicales. Los eventos creados quedan pendientes de aprobación.
+- **Administrador:** Puede iniciar sesión, ver todos los eventos (habilitados y pendientes) y habilitar eventos para que sean visibles en la cartelera pública.
+
+### Flujo de eventos
+1. El artista crea un evento desde su panel. El evento se guarda como pendiente (`habilitado = false`).
+2. El administrador accede a su panel, donde puede ver todos los eventos y habilitar los que considere aptos.
+3. Solo los eventos habilitados aparecen en la cartelera pública para todos los usuarios.
+
+### Tecnologías
+- **Frontend:** HTML, CSS, JavaScript
+- **Backend:** Node.js + Express
+- **Base de datos:** MySQL
+- **Autenticación:** Manejo de sesiones y control de acceso por rol
+
+Este flujo asegura que solo los eventos validados por el administrador sean publicados, manteniendo la calidad y seguridad de la cartelera.
 📝 Notas Adicionales
 Este proyecto fue desarrollado como parte de [mencionar curso, materia o institución si es necesario]. 
 

@@ -1,3 +1,7 @@
+const express = require('express');
+const router = express.Router();
+const Event = require('../models/eventModel');
+
 // Ruta para habilitar un evento (admin)
 router.put('/:id/habilitar', async (req, res) => {
   try {
@@ -8,6 +12,7 @@ router.put('/:id/habilitar', async (req, res) => {
     res.status(500).json({ error: 'Error al habilitar el evento' });
   }
 });
+
 // Ruta para que el admin vea todos los eventos (habilitados y no habilitados)
 router.get('/pendientes', async (req, res) => {
   try {
@@ -17,9 +22,6 @@ router.get('/pendientes', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener los eventos pendientes' });
   }
 });
-const express = require('express');
-const router = express.Router();
-const Event = require('../models/eventModel');
 
 // Ruta pública para obtener todos los eventos
 router.get('/', async (req, res) => {
