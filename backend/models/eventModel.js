@@ -15,31 +15,49 @@ exports.getAllRaw = async () => {
   return results;
 };
 
-const mysql = require('mysql2/promise');
-require('dotenv').config();
-
-// Creamos un pool de conexiones usando la API de promesas
-const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
+// Pool de conexiones a MySQL usando mysql2/promise
+const db = require('../config/database');
 
 exports.create = async (artistaId, evento) => {
-  const query = `CALL agregar_evento(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  // Validar que hora esté presente y sea válida
+  const hora = evento.hora || '';
+
+  // Validar/truncar enlace_flyer para evitar ER_DATA_TOO_LONG
+  const maxFlyerLen = 255;
+  let enlaceFlyer = evento.enlace_flyer || '';
+  if (enlaceFlyer.length > maxFlyerLen) {
+    console.warn('enlace_flyer demasiado largo, truncando a', maxFlyerLen);
+    enlaceFlyer = enlaceFlyer.slice(0, maxFlyerLen);
+  }
+
+  // Insert directo a la tabla `eventos` para simplificar y evitar dependencia
+  // con procedimientos almacenados que puedan tener firmas distintas.
+  // Esto hace el código más simple para un proyecto educativo: enviamos
+  // los campos ya validados desde el controlador y dejamos la lógica SQL
+  // sencilla aquí (INSERT INTO ...).
+  const fechaOnly = (evento.fecha || '').toString().split('T')[0] || null;
+  // Asegurar formato de hora 'HH:MM:SS' o null
+  let horaFormatted = null;
+  if (hora) {
+    // hora puede venir como 'HH:MM' o 'HH:MM:SS'
+    horaFormatted = hora.length === 5 ? hora + ':00' : hora;
+  }
+  // Nota: los tipos y longitudes deben coincidir con el esquema de la tabla
+  // definido en `backend/sql/script_inicial.sql`.
+  const query = `INSERT INTO eventos (artista_id, titulo, fecha, hora, lugar, tipo_entrada, precio, enlace_entradas, enlace_flyer, habilitado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const [result] = await db.execute(query, [
     artistaId,
     evento.titulo,
-    evento.fecha,
+    fechaOnly,
+    horaFormatted,
     evento.lugar,
     evento.tipo_entrada,
     evento.precio,
     evento.enlace_entradas,
-    evento.enlace_flyer,
-    evento.habilitado || false
+    enlaceFlyer,
+    evento.habilitado ? 1 : 0
   ]);
-  return true; // Adjusted to match the original logic
+  return result; // devuelve el resultado de la inserción
 };
 
 exports.getAll = async () => {
@@ -52,4 +70,11 @@ exports.getAll = async () => {
   `;
   const [results] = await db.query(query);
   return results;
+};
+
+// Elimina un evento por id (eliminación física)
+exports.delete = async (id) => {
+  const query = 'DELETE FROM eventos WHERE id = ?';
+  const [result] = await db.execute(query, [id]);
+  return result;
 };

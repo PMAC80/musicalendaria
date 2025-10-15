@@ -7,15 +7,16 @@
   <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-  <h1>Bienvenido, Administrador</h1>
+  <h1>Bienvenido al portal de Administrador</h1>
   <p>Desde aquí podés validar y habilitar eventos.</p>
-  <table id="tablaEventos" border="1" style="margin-bottom:20px;">
+  <table id="tablaEventos" border="4" style="margin-bottom:20px;">
     <thead>
       <tr>
         <th>ID</th>
         <th>Título</th>
         <th>Artista</th>
         <th>Fecha</th>
+        <th>Hora</th>
         <th>Lugar</th>
         <th>Habilitado</th>
         <th>Acción</th>
@@ -24,7 +25,8 @@
     <tbody></tbody>
   </table>
   <div id="msgAdmin"></div>
-  <a href="/auth/logout">Cerrar sesión</a>
+  <!-- Logout: llamamos al endpoint POST /auth/logout, eliminamos token y redirigimos al portal -->
+  <a href="#" id="logoutLink">Cerrar sesión</a>
 
   <script>
     async function cargarPendientes() {
@@ -38,15 +40,30 @@
           <td>${ev.id}</td>
           <td>${ev.titulo}</td>
           <td>${ev.nombre_artista}</td>
-          <td>${ev.fecha}</td>
+          <td>${new Date(ev.fecha).toLocaleDateString()}</td>
+          <td>${new Date(ev.fecha).toLocaleTimeString()}</td>
           <td>${ev.lugar}</td>
           <td>${ev.habilitado ? 'Sí' : 'No'}</td>
           <td>
             ${ev.habilitado ? '' : `<button onclick="habilitarEvento(${ev.id})">Habilitar</button>`}
+            <button onclick="eliminarEvento(${ev.id})" style="margin-left:8px;">Eliminar</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    // Función para eliminar un evento por id (llama al endpoint DELETE)
+    async function eliminarEvento(id) {
+      if (!confirm('¿Confirma eliminar el evento ' + id + '? Esta acción no se puede deshacer.')) return;
+      const res = await fetch(`/api/eventos/${id}`, { method: 'DELETE' });
+      const msg = document.getElementById('msgAdmin');
+      if (res.ok) {
+        msg.textContent = 'Evento eliminado correctamente.';
+        cargarPendientes();
+      } else {
+        msg.textContent = 'Error al eliminar el evento.';
+      }
     }
 
     async function habilitarEvento(id) {
@@ -61,6 +78,23 @@
     }
 
     cargarPendientes();
+    // Handler de logout para redirigir al portal principal
+    document.getElementById('logoutLink').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const token = localStorage.getItem('token');
+      try {
+        // Llamada al endpoint (placeholder) para seguir el contrato API
+        await fetch('/auth/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+      } catch (err) {
+        // No interrumpimos por errores de red: igual eliminamos token
+        console.error('Logout error:', err);
+      }
+      // Eliminar datos de sesión del cliente
+      localStorage.removeItem('token');
+      localStorage.removeItem('artist_id');
+      localStorage.removeItem('user_role');
+      window.location.href = '/index.html';
+    });
   </script>
 </body>
 </html>

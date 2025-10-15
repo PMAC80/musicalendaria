@@ -35,28 +35,38 @@
   <!-- Mensaje de éxito o error al enviar el evento -->
   <div id="eventoMsg"></div>
 
-  <!-- Enlace para cerrar sesión -->
-  <a href="/auth/logout">Cerrar sesión</a>
+  <!-- Enlace para cerrar sesión: se maneja con JS para eliminar token y redirigir -->
+  <a href="#" id="logoutLink">Cerrar sesión</a>
+  <!-- Enlace para volver al menú principal -->
+  <a href="/index.html">Volver al menú principal</a>
 
   <!-- Script para manejar el envío del formulario sin recargar la página -->
   <script>
+    // Manejo del envío del formulario mediante fetch (sin recargar la página)
+    // Normalizamos los campos (precio, hora, artista_id) para que el backend
+    // reciba valores consistentes y evitar errores de tipo en la BD.
     document.getElementById('eventoForm').addEventListener('submit', async function(e) {
       e.preventDefault(); // Evita que el formulario recargue la página
       const form = e.target;
       // Toma los valores de los campos del formulario
       const artist_id = localStorage.getItem('artist_id');
+  // Normalizar y validar campos antes de enviar
+      const precioNum = parseFloat(form.precio.value) || 0;
+      const horaVal = form.hora.value ? form.hora.value.substring(0,5) : null; // 'HH:MM'
       const data = {
         titulo: form.titulo.value,
         fecha: form.fecha.value,
-        hora: form.hora.value,
+        hora: horaVal,
         lugar: form.lugar.value,
         tipo_entrada: form.tipo_entrada.value,
-        precio: form.precio.value,
+        precio: precioNum.toString(),
         enlace_entradas: form.enlace_entradas.value,
         enlace_flyer: form.enlace_flyer.value,
         habilitado: false, // El evento se crea como no habilitado
-        artista_id: artist_id
+        artista_id: Number(artist_id) || null
       };
+  // Mostrar en consola (útil para debug durante desarrollo)
+  console.log('Datos enviados:', data);
       // Envía los datos al backend usando fetch
       const res = await fetch('/api/eventos', {
         method: 'POST',
@@ -72,6 +82,22 @@
         msg.textContent = 'Error al enviar el evento.';
       }
     });
+
+      // Manejo de logout desde el panel del artista
+      document.getElementById('logoutLink').addEventListener('click', async (e) => {
+        e.preventDefault();
+        const token = localStorage.getItem('token');
+        try {
+          await fetch('/auth/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+        } catch (err) {
+          console.error('Logout error:', err);
+        }
+        // Eliminar datos de sesión adicionales
+        localStorage.removeItem('token');
+        localStorage.removeItem('artist_id');
+        localStorage.removeItem('user_role');
+        window.location.href = '/index.html';
+      });
   </script>
 </body>
 </html>

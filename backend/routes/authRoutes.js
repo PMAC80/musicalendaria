@@ -1,12 +1,10 @@
 // backend/routes/authRoutes.js
 
-// Importa Express para crear el router de rutas
 const express = require('express');
-//Cada archivo de rutas suele crear su propio router con express.Router()
 const router = express.Router();
 
-// Importa el controlador de autenticación
 const authController = require('../controllers/authController');
+const { verifyToken, requireRole } = require('../middleware/jwtMiddleware');
 
 // Ruta GET para mostrar el formulario de login (más adelante se usará en frontend)
 
@@ -18,8 +16,14 @@ router.post('/login', authController.login);
 // Ruta POST para registrar un nuevo usuario (artista o admin)
 router.post('/register', authController.register);
 
-// Ruta GET para cerrar sesión (se podria haber usado una ruta POST)
-router.get('/logout', authController.logout);
+// Logout: con JWT el servidor no mantiene sesión. El frontend debe eliminar el token.
+router.post('/logout', (req, res) => {
+  // Placeholder:Invalidate token if you keep a token blacklist. For now instruct client to delete token.
+  res.json({ message: 'Logout: elimine el token en el cliente' });
+});
+
+// Ruta protegida para el panel de administrador
+// Nota: las páginas de dashboard están servidas en `server.js` y protegidas por JWT.
 
 // Exporta el router para usarlo en server.js
 module.exports = router;

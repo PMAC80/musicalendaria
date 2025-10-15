@@ -1,8 +1,11 @@
 // backend/controllers/authController.js
+//Aqui se encuentra la Lógica de autenticación y manejo de usuarios
 // bcrypt: librería que se usa para encriptar contraseñas de manera segura antes de guardarlas en la base de datos.
 const bcrypt = require('bcrypt');
 const User = require('../models/userModel');
 const Artista = require('../models/artistaModel'); // Nuevo modelo
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // Registro
 exports.register = async (req, res) => {
@@ -29,7 +32,7 @@ exports.register = async (req, res) => {
       await Artista.create(userId, nombreArtista);
     }
 
-    res.status(201).send('Usuario registrado exitosamente');
+    res.status(201).json({ message: 'Usuario registrado exitosamente', redirect: '/login.html' });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error en el registro');
@@ -45,21 +48,22 @@ exports.login = async (req, res) => {
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ error: 'Contraseña incorrecta' });
+    // Emitir JWT
+    const payload = { id: user.id, rol: user.rol, nombre: user.nombre };
+    const token = jwt.sign(payload, process.env.JWT_SECRET || 'secretjwtkey', { expiresIn: '6h' });
 
-    req.session.userId = user.id;
+  // No se usan sesiones; el cliente debe almacenar el token JWT
 
     if (user.rol === 'admin') {
-      // Para admin, redirige como antes
-      return res.json({ success: true, rol: 'admin', redirect: '/dashboard/admin.html' });
+      return res.json({ success: true, rol: 'admin', token, redirect: '/dashboard/admin.html' });
     } else if (user.rol === 'artista') {
-      // Para artista, busca el artist_id y lo devuelve
       const artista = await Artista.findByUserId(user.id);
       if (!artista) {
         return res.status(403).json({ error: 'No existe artista para este usuario' });
       }
-      return res.json({ success: true, rol: 'artista', redirect: '/dashboard/artista.html', artist_id: artista.id });
+      return res.json({ success: true, rol: 'artista', token, redirect: '/dashboard/artista.html', artist_id: artista.id });
     } else {
-      return res.json({ success: true, rol: user.rol, redirect: '/' });
+      return res.json({ success: true, rol: user.rol, token, redirect: '/' });
     }
   } catch (err) {
     console.error(err);
@@ -67,12 +71,8 @@ exports.login = async (req, res) => {
   }
 };
 
-// Logout
+// Logout (JWT): servidor no mantiene sesión. El cliente debe eliminar el token.
 exports.logout = (req, res) => {
-  // Destruye la sesión del usuario
-  req.session.destroy(() => {
-    // Redirige al usuario a la página de inicio después de cerrar sesión
-    res.redirect('/index.html');
-  });
-  };
+  res.json({ message: 'Logout: elimine el token en el cliente' });
+};
 

@@ -1,15 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cartelera de Espectáculos - Musicalendaria</title>
+  <title>Musicalendaria</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <header class="main-header" style="position: relative; padding: 10px 20px;">
-    <a href="login.html" style="position: absolute; top: 10px; right: 20px; font-size: 0.95em; color: #2196f3; text-decoration: none; font-weight: 500;">Iniciar sesión</a>
+    <a href="login.html" style="position: absolute; top: 10px; right: -80px; font-size: 0.95em; color: #2196f3; text-decoration: none; font-weight: 500;">Iniciar sesión</a>
     <h1 style="margin: 40px 0 10px 0; text-align: center;">Cartelera de Espectáculos</h1>
     <div style="display: flex; justify-content: center; margin-bottom: 10px;">
       <input type="text" id="buscador" placeholder="¿Qué quieres ver?" style="width: 300px;">
@@ -19,7 +18,15 @@
     <section id="cartelera" class="cartelera-grid">
       <!-- Aquí se mostrarán las tarjetas de espectáculos -->
     </section>
+
+  <!-- Sección dinámica: la cartelera se carga desde la API -->
+  <section aria-hidden="true">
+    <!-- Los eventos se inyectan en <section id="cartelera"> por frontDispatcher.js -->
+  </section>
   </main>
   <script src="js/frontDispatcher.js"></script>
+  <footer style="text-align:center; margin: 40px 0; color:#777;">
+    <p>© Musicalendaria - Cartelera dinámica</p>
+  </footer>
 </body>
 </html>
